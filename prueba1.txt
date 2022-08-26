@@ -1,0 +1,4 @@
+PROG
+VAR n, x, y;
+
+GORP

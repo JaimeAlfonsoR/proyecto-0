@@ -1,4 +1,5 @@
 PROG
-VAR n, x, y;
+VAR np,x,y;
+M;
 
 GORP

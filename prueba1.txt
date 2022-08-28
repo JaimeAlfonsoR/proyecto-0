@@ -1,5 +1,14 @@
 PROG
-VAR np, x,y;
-G(x,y);
+VAR n,x,y;
+PROC putCB(c , b, n)
+{
+    drop (x) ;
+    free (b) ;
+    walk (n)
+
+}
+CORP
+
+
 
 GORP

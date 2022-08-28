@@ -1,5 +1,5 @@
 PROG
-VAR np,x,y;
-M;
+VAR np, x,y;
+G(x,y);
 
 GORP

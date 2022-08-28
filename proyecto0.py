@@ -1,9 +1,11 @@
 comandos=["M","R","C","B","c","b","P","J","G"]                    #definicion de grupos
 instrucciones=["walk","jump","jumpTo","veer","look","drop","grab","get","free","pop","walk"]     
 condiciones=["isfacing","isValid","canWalk","not"]
-variables=[]
+variables={"x":4}
 
 
+from asyncio.windows_events import NULL
+from distutils.command.config import config
 import nltk as tk
 
 
@@ -14,6 +16,32 @@ def main():
     parser(tokens)
 def varsRobot():
     pass
+def explorarparam(num:int, tokens:list,i:int):
+    error=False
+    q=0
+    while not(error) and q<num:
+        if tokens[i]!=",":
+            if tokens[i].isdigit() or (tokens[i] in variables):
+                if ("." or "-") not in tokens[i] and tokens[i].isdigit():
+                    i+=1
+                    q+=1
+                elif isinstance(variables[tokens[i]], int) and (tokens[i] in variables):
+                    i+=1
+                    q+=1
+
+                else:
+                    print("error de sintaxis")    
+                    error=True
+            else:
+                print("error de sintaxis")    
+                error=True  
+            if  tokens[i]=="GORP":
+                i-=1
+                print("error de sintaxis")    
+                error=True
+        else:
+            i+=1  
+    return i,error
 
 
 def parser(tokens):
@@ -28,14 +56,18 @@ def parser(tokens):
             if tokens[i]=="VAR":
                 i+=1
                 while tokens[i]!= ";" and not(error):
-                    if tokens[i]!= ",":
-                        variables.append(tokens[i])
+                    if tokens[i][0].isdigit():
+                        print ("error de sintaxis")
+                        error=True
+                    elif tokens[i]!= ",":
+                        variables[tokens[i]]=" "
                     i+=1
                     if tokens[i]== "GORP":
                         print("error de sintaxis")
                         i-=1
                         error=True
-                i+=1        
+                i+=1
+                variables["x"]=4        
             elif tokens[i] in comandos:
                 i+=1
                 if tokens[i]==";" and tokens[i-1]!="G" and tokens[i-1]!="J":
@@ -66,9 +98,13 @@ def parser(tokens):
                                 if not(k.isdigit()) and not((k in variables)):
                                     print("error de sintaxis")    
                                     error=True
-                                    if not(("." or "-") not in k or isinstance(k, int)):
+                                elif (("." or "-") in k) and (k not in variables):
+                                    print("error de sintaxis")    
+                                    error=True
+                                elif (k in variables):
+                                    if not(isinstance(variables[k], int)):
                                         print("error de sintaxis")    
-                                        error=True
+                                        error=True      
                             i+=1          
                         elif 0==len(param) or len(param)>=2:
                             print("error de sintaxis")
@@ -76,7 +112,8 @@ def parser(tokens):
 
                         else: 
                             if tokens[i-2]=="G":
-                                q=0
+                                i,error=explorarparam(2,tokens,i)
+                                """q=0
                                 while not(error) and q<2:
                                     if tokens[i]!=",":
                                         if tokens[i].isdigit() or (tokens[i] in variables):
@@ -95,15 +132,20 @@ def parser(tokens):
                                             print("error de sintaxis")    
                                             error=True
                                     else:
-                                        i+=1  
+                                        i+=1  """
                             else:
-                                if tokens[i].isdigit() or (tokens[i] in variables):
+                                i,error=explorarparam(1,tokens,i)
+                                """if tokens[i].isdigit() or (tokens[i] in variables):
                                     if ("." or "-") not in tokens[i] or isinstance(tokens[i], int):
                                         i+=1
 
                                     else:
                                         print("error de sintaxis")    
                                         error=True
+                                else:  
+                                    print("error de sintaxis")    
+                                    error=True   """
+
 
 
 
@@ -128,7 +170,7 @@ def parser(tokens):
 
             
             
-        print(tokens)        
+        print(tokens)  
 
 
 

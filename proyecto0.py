@@ -113,41 +113,9 @@ def parser(tokens):
                         else: 
                             if tokens[i-2]=="G":
                                 i,error=explorarparam(2,tokens,i)
-                                """q=0
-                                while not(error) and q<2:
-                                    if tokens[i]!=",":
-                                        if tokens[i].isdigit() or (tokens[i] in variables):
-                                            if ("." or "-") not in tokens[i] or isinstance(tokens[i], int):
-                                                i+=1
-                                                q+=1
-
-                                            else:
-                                                print("error de sintaxis")    
-                                                error=True
-                                        else:
-                                            print("error de sintaxis")    
-                                            error=True  
-                                        if  tokens[i]=="GORP":
-                                            i-=1
-                                            print("error de sintaxis")    
-                                            error=True
-                                    else:
-                                        i+=1  """
+                                
                             else:
                                 i,error=explorarparam(1,tokens,i)
-                                """if tokens[i].isdigit() or (tokens[i] in variables):
-                                    if ("." or "-") not in tokens[i] or isinstance(tokens[i], int):
-                                        i+=1
-
-                                    else:
-                                        print("error de sintaxis")    
-                                        error=True
-                                else:  
-                                    print("error de sintaxis")    
-                                    error=True   """
-
-
-
 
                         if tokens[i]==")":
                             i+=1

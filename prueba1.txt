@@ -1,6 +1,7 @@
 PROG
 VAR n,x,y;
-PROC putCB(c , b, n)
+walk(right,9);
+PROC putCB(n , b, n)
 {
     drop (x) ;
     free (b) ;
@@ -8,6 +9,7 @@ PROC putCB(c , b, n)
 
 }
 CORP
+
 
 
 

@@ -1,16 +1,7 @@
 PROG
-VAR n,x,y;
+VAR nop,x,y;
 walk(right,9);
-PROC putCB(n , b, n)
-{
-    drop (x) ;
-    free (b) ;
-    walk (n)
-
-}
-CORP
-
-
+nop =90;
 
 
 GORP

@@ -308,9 +308,73 @@ def parser(tokens):
                 i+=1
                 print(tokens)
                 i,error=evalins(tokens,i,error)
-                
+            elif tokens[i] in variables :
+                i+=1
+                if tokens[i]=="=" or (tokens[i][0]=="=" and (tokens[i][1:].isdigit())):
+                    i+=1
+                    if (("." or "-") not in tokens[i]) and (tokens[i].isdigit()):
+                        i+=1
+                        if tokens[i]==";":
+                            variables[tokens[i-3]]=int(tokens[i-1])
+                            print(variables)
+                            i+=1
+                        else:
+                            errorSintax()
+                            error=True
+                    elif (("." or "-") not in tokens[i-1]):
+                        if tokens[i]==";":
+                            variables[tokens[i-2]]=int(tokens[i-1][1])
+                            print(variables)
+                            i+=1
+                        else:
+                            errorSintax()
+                            error=True
 
-           
+
+                    else:
+                        errorSintax()
+                        error=True
+                else:
+                    errorSintax()
+                    error=True
+
+            elif "=" in tokens[i]:
+                p=""
+                param=[]
+                for k in tokens[i]:
+                    if k!="=":
+                        p+=k  
+                    else:
+                        if not(p in variables):
+                            errorSintax()
+                            error=True
+                        else:
+                            param.append(p)
+                            p="" 
+                param.append(p)               
+                if not(p.isdigit()) or (("." or "-") in p):
+                    if tokens[i+1].isdigit() and (("."or"-" not in tokens[i+1])):
+                        i+=2
+                        if tokens[i]==";":
+                            variables[param[0]]=int(tokens[i-1])
+                            print(variables)
+                            i+=1
+                        else:
+                            errorSintax()
+                            error=True    
+                    else:    
+                        errorSintax()
+                        error=True
+                else:
+                    i+=1
+                    if tokens[i]==";":
+                        variables[param[0]]=int(param[1])
+                        print(variables)
+                        i+=1 
+                    else:
+                        errorSintax()
+                        error=True       
+
             else:
                 errorSintax()
 

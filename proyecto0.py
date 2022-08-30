@@ -14,7 +14,7 @@ direcciones1=["left","right","around"]
 direcciones2=["left","right","front","back"]
 card=["north","south","east","west"]
 variables={"x":4}
-procedimientos = []
+procedimientos = {}
 
 def main():
     filename = 'prueba1.txt'
@@ -373,82 +373,27 @@ def parser(tokens):
 
             ##PROCESOS Y BLOQUE DE INSTRUCCIONES##
             elif tokens[i] == 'PROC':
-                if tokens[i] in instrucciones:  
-                    ins = []
-                    count = 0
-                    procedimientos = []
-                    estControl = []
-                    while tokens[i] != 'CORP' and not(error):
-                        if tokens[i] == 'PROC' and tokens[i+3] == ')': 
-                            ##Estructuras de control
-                            while tokens[i] != '}':
-                                estControl.append(tokens[i])
-                                i+=1
-                            if estControl[2] != '(':
-                                errorSintax(getframeinfo(currentframe()))
-                            if estControl[3] != ')':
-                                errorSintax(getframeinfo(currentframe()))
-                            if estControl[4] != '{':
-                                errorSintax(getframeinfo(currentframe()))
-                            if estControl[5] in condicionales:
-                                condicionalx = estControl[5]
-                                if condicionalx == 'while':
-                                    try:
-                                        if estControl[6] != '(':
-                                            errorSintax(getframeinfo(currentframe()))
-                                        if estControl[7] == ' ':
-                                            errorSintax(getframeinfo(currentframe()))
-                                        if estControl[8] != ')':
-                                            errorSintax(getframeinfo(currentframe()))
-                                        if estControl[9] != 'do':
-                                            errorSintax(getframeinfo(currentframe()))
-                                        if estControl[10] == ' ':
-                                            errorSintax(getframeinfo(currentframe()))
-                                        if estControl[11] != 'od':
-                                            errorSintax(getframeinfo(currentframe()))
-                                    except:
-                                        errorSintax(getframeinfo(currentframe()))
-
-                                if condicionalx == 'repeatTimes':
-                                    print(1) ##Falta este entero
+                i+=2
+                if tokens[i]=="(":
+                    i+=1
+                    parame=[]
+                    while tokens[i]!=")" and not(error):
+                        parame.append(tokens[i])
+                        i+=1
+                        if tokens[i]=="{":
+                            errorSintax(getframeinfo(currentframe()))
+                            error=True
+                        if tokens[i]=="CORP":
+                            errorSintax(getframeinfo(currentframe()))
+                            error=True 
+                    procedimientos[tokens[i-2-len(parame)]]=parame 
+                    if tokens[i]==")":
+                        i+=1
+                        if tokens[i]=="{":
+                            i+=1
+                            parser(tokens[i:])   
 
 
-                                if condicionalx == 'if':
-                                    print(estControl)
-                                    try: 
-                                        if estControl[6] != '(':
-                                            errorSintax(getframeinfo(currentframe()))
-                                        if estControl[7] == 'isfacing':
-                                            print('evalcond') ##NECESITA VERIFICAR LA CONDICION.
-                                            if estControl[11] != ')':
-                                                errorSintax(getframeinfo(currentframe()))
-                                            if estControl[12] != '{':
-                                                errorSintax(getframeinfo(currentframe()))
-                                            if estControl[13] in instrucciones:
-                                                print("Necesita evalins") ##NECESITA VERIFICAR LA INSTRUCCION.
-                                            
-                                        
-                                        if estControl[7] == 'not':
-                                            if estControl[11] != ')':
-                                                errorSintax(getframeinfo(currentframe()))
-                                            if estControl[12] != '{':
-                                                errorSintax(getframeinfo(currentframe()))
-                                            
-                                        if estControl[7] in condicions2param:
-                                            if estControl[12] != ')':
-                                                errorSintax(getframeinfo(currentframe()))
-                                            if estControl[13] != '{': 
-                                                errorSintax(getframeinfo(currentframe()))
-
-                                            if estControl[22] == 'else':
-                                                print(1)
-                                                if estControl[11] == '{': ##BLOCK2
-                                                    errorSintax(getframeinfo(currentframe()))
-                                                if estControl[12] != 'fi':
-                                                    errorSintax(getframeinfo(currentframe()))
-
-                                    except:
-                                        errorSintax(getframeinfo(currentframe()))
                                 
                             
 
@@ -483,6 +428,12 @@ def parser(tokens):
                         
                         else:
                             error = True
+            elif tokens[i] =="if":
+                i+=1
+            elif tokens[i] =="while":
+                i+=1   
+            elif tokens[i] =="repeatTimes":
+                i+=1                     
             elif tokens[i] in instrucciones:
                 i+=1
                 print(tokens)

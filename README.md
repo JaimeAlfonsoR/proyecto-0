@@ -1,5 +1,5 @@
-# proyecto-0
-Proyecto 0 de lym
+# P0: Parser 
+Proyecto 0 de LYM
 
 Jaime Alfonso 
 Nicolas Camargo

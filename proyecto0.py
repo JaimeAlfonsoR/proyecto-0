@@ -1,10 +1,13 @@
 from asyncio.windows_events import NULL
 from distutils.command.config import config
+from inspect import currentframe, getframeinfo
 import nltk as tk
 
 comandos=["M","R","C","B","c","b","P","J","G"]                    #definicion de grupos
 instrucciones=["walk","jump","jumpTo","veer","look","drop","grab","get","free","pop","walk", "PROC", "CORP"]     
 condiciones=["isfacing","isValid","canWalk","not"]
+condicionales = ["while", "do", "if", "od", "fi", "else"]
+condicions2param = ["isValid", "canWalk"]
 direcciones1=["left","right","around"]
 direcciones2=["left","right","front","back"]
 card=["north","south","east","west"]
@@ -17,8 +20,8 @@ def main():
     tokens = tk.word_tokenize(file,"",True)
     parser(tokens)
 
-def errorSintax():
-    print("Error de sintaxis")
+def errorSintax(frameinfo):
+    print("Error de sintaxis detectado en la linea de codigo:", frameinfo.lineno)
     exit()
 
 def sintaxChecker(palabra, lista):
@@ -48,17 +51,17 @@ def explorarparam(num:int, tokens:list,i:int):
                     q+=1
 
                 else:
-                    errorSintax()   
+                    errorSintax(getframeinfo(currentframe()))   
                     error=True
             else:
-                errorSintax()    
+                errorSintax(getframeinfo(currentframe()))   
                 error=True  
             if  tokens[i]=="GORP":
                 i-=1
-                errorSintax()    
+                errorSintax(getframeinfo(currentframe()))   
                 error=True
         elif num==1:
-            errorSintax()    
+            errorSintax(getframeinfo(currentframe()))   
             error=True        
         else:
             i+=1  
@@ -69,7 +72,7 @@ def evalins (tokens:list,i:int,error:bool):
     if tokens[i]==";":
         i+=1
         error=True
-        errorSintax()
+        errorSintax(getframeinfo(currentframe()))
     elif tokens[i]=="(":
          
         i+=1
@@ -94,33 +97,33 @@ def evalins (tokens:list,i:int,error:bool):
 
                 for k in param:
                     if not(k.isdigit()) and not((k in variables)):
-                        errorSintax()   
+                        errorSintax(getframeinfo(currentframe()))   
                         error=True
                     elif (("." or "-") in k) and (k not in variables):
-                        errorSintax()   
+                        errorSintax(getframeinfo(currentframe()))   
                         error=True
                     elif (k in variables):
                         if not(isinstance(variables[k], int)):
-                            errorSintax()   
+                            errorSintax(getframeinfo(currentframe()))   
                             error=True
             elif tokens[i-2]=="walk":
 
                 if not(param[1].isdigit()) and not((param[1] in variables)):
-                    errorSintax()   
+                    errorSintax(getframeinfo(currentframe()))  
                     error=True
                 elif (("." or "-") in param[1]) and (param[1] not in variables):
-                    errorSintax()   
+                    errorSintax(getframeinfo(currentframe()))   
                     error=True
                 elif (param[1] in variables):
                     if not(isinstance(variables[param[0]], int)):
-                        errorSintax()   
+                        errorSintax(getframeinfo(currentframe()))   
                         error=True 
                 if not(param[0] in direcciones2) and not((param[0] in card)):
-                    errorSintax()   
+                    errorSintax(getframeinfo(currentframe()))   
                     error=True                                  
             i+=1          
         elif 0==len(param) or len(param)>=2:
-            errorSintax()
+            errorSintax(getframeinfo(currentframe()))
             error=True
 
         else: 
@@ -128,13 +131,13 @@ def evalins (tokens:list,i:int,error:bool):
                 i,error=explorarparam(2,tokens,i)
             elif  tokens[i-2]=="veer":   
                 if not(tokens[i] in direcciones1):
-                    errorSintax()   
+                    errorSintax(getframeinfo(currentframe()))   
                     error=True
                 else:
                     i+=1
             elif  tokens[i-2]=="look":   
                 if not(tokens[i] in card):
-                    errorSintax()   
+                    errorSintax(getframeinfo(currentframe()))   
                     error=True
                 else:
                     i+=1 
@@ -145,14 +148,14 @@ def evalins (tokens:list,i:int,error:bool):
                     elif isinstance(variables[tokens[i]], int) and (tokens[i] in variables):
                         i+=1
                     else:
-                        errorSintax()
+                        errorSintax(getframeinfo(currentframe()))
                         error=True    
                 elif  (tokens[i] in direcciones2) or (tokens[i] in card):
                     i+=1
                     i,error=explorarparam(2,tokens,i)   
                     print(33)     
                 else:
-                    errorSintax()
+                    errorSintax(getframeinfo(currentframe()))
                     error=True
             else:
                 i,error=explorarparam(1,tokens,i)   
@@ -162,14 +165,14 @@ def evalins (tokens:list,i:int,error:bool):
             if tokens[i]==";":
                 i+=1
             else:
-                errorSintax()
+                errorSintax(getframeinfo(currentframe()))
                 error=True 
         else:
-            errorSintax()
+            errorSintax(getframeinfo(currentframe()))
             error=True        
                                          
     else:
-        errorSintax()
+        errorSintax(getframeinfo(currentframe()))
         error=True             
 
     return i,error
@@ -189,13 +192,13 @@ def parser(tokens):
                 i+=1
                 while tokens[i]!= ";" and not(error):
                     if tokens[i][0].isdigit():
-                        errorSintax()
+                        errorSintax(getframeinfo(currentframe()))
                         error=True
                     elif tokens[i]!= ",":
                         variables[tokens[i]]= " "
                     i+=1
                     if tokens[i]== "GORP":
-                        errorSintax()
+                        errorSintax(getframeinfo(currentframe()))
                         i-=1
                         error=True
                 i+=1
@@ -228,18 +231,18 @@ def parser(tokens):
 
                             for k in param:
                                 if not(k.isdigit()) and not((k in variables)):
-                                    errorSintax()   
+                                    errorSintax(getframeinfo(currentframe()))  
                                     error=True
                                 elif (("." or "-") in k) and (k not in variables):
-                                    errorSintax()   
+                                    errorSintax(getframeinfo(currentframe()))   
                                     error=True
                                 elif (k in variables):
                                     if not(isinstance(variables[k], int)):
-                                        errorSintax()   
+                                        errorSintax(getframeinfo(currentframe()))   
                                         error=True      
                             i+=1          
                         elif 0==len(param) or len(param)>=2:
-                            errorSintax()
+                            errorSintax(getframeinfo(currentframe()))
                             error=True
 
                         else: 
@@ -255,37 +258,111 @@ def parser(tokens):
                             if tokens[i]==";":
                                 i+=1
                             else:
-                                errorSintax()
+                                errorSintax(getframeinfo(currentframe()))
                                 error=True 
                         else:
-                            errorSintax()
+                            errorSintax(getframeinfo(currentframe()))
                             error=True        
                                          
                     else:
-                        errorSintax()
+                        errorSintax(getframeinfo(currentframe()))
                         error=True    
 
 
             ##PROCESOS Y BLOQUE DE INSTRUCCIONES##
             elif tokens[i] == 'PROC':
-                if tokens[i] in instrucciones:
+                if tokens[i] in instrucciones:  
                     ins = []
                     count = 0
                     procedimientos = []
+                    estControl = []
                     while tokens[i] != 'CORP' and not(error):
-                        if tokens[i] == 'PROC':
+                        if tokens[i] == 'PROC' and tokens[i+3] == ')': 
+                            ##Estructuras de control
+                            while tokens[i] != '}':
+                                estControl.append(tokens[i])
+                                i+=1
+                            if estControl[2] != '(':
+                                errorSintax(getframeinfo(currentframe()))
+                            if estControl[3] != ')':
+                                errorSintax(getframeinfo(currentframe()))
+                            if estControl[4] != '{':
+                                errorSintax(getframeinfo(currentframe()))
+                            if estControl[5] in condicionales:
+                                condicionalx = estControl[5]
+                                if condicionalx == 'while':
+                                    try:
+                                        if estControl[6] != '(':
+                                            errorSintax(getframeinfo(currentframe()))
+                                        if estControl[7] == ' ':
+                                            errorSintax(getframeinfo(currentframe()))
+                                        if estControl[8] != ')':
+                                            errorSintax(getframeinfo(currentframe()))
+                                        if estControl[9] != 'do':
+                                            errorSintax(getframeinfo(currentframe()))
+                                        if estControl[10] == ' ':
+                                            errorSintax(getframeinfo(currentframe()))
+                                        if estControl[11] != 'od':
+                                            errorSintax(getframeinfo(currentframe()))
+                                    except:
+                                        errorSintax(getframeinfo(currentframe()))
+
+                                if condicionalx == 'repeatTimes':
+                                    print(1) ##Falta este entero
+
+
+                                if condicionalx == 'if':
+                                    print(estControl)
+                                    try: 
+                                        if estControl[6] != '(':
+                                            errorSintax(getframeinfo(currentframe()))
+                                        if estControl[7] == 'isfacing':
+                                            print('evalcond') ##NECESITA VERIFICAR LA CONDICION.
+                                            if estControl[11] != ')':
+                                                errorSintax(getframeinfo(currentframe()))
+                                            if estControl[12] != '{':
+                                                errorSintax(getframeinfo(currentframe()))
+                                            if estControl[13] in instrucciones:
+                                                print("Necesita evalins") ##NECESITA VERIFICAR LA INSTRUCCION.
+                                            
+                                        
+                                        if estControl[7] == 'not':
+                                            if estControl[11] != ')':
+                                                errorSintax(getframeinfo(currentframe()))
+                                            if estControl[12] != '{':
+                                                errorSintax(getframeinfo(currentframe()))
+                                            
+                                        if estControl[7] in condicions2param:
+                                            if estControl[12] != ')':
+                                                errorSintax(getframeinfo(currentframe()))
+                                            if estControl[13] != '{': 
+                                                errorSintax(getframeinfo(currentframe()))
+
+                                            if estControl[22] == 'else':
+                                                print(1)
+                                                if estControl[11] == '{': ##BLOCK2
+                                                    errorSintax(getframeinfo(currentframe()))
+                                                if estControl[12] != 'fi':
+                                                    errorSintax(getframeinfo(currentframe()))
+
+                                    except:
+                                        errorSintax(getframeinfo(currentframe()))
+                                
+                            
+
+                        elif tokens[i] == 'PROC' and tokens[i+3] != ')':
                             i+=1
                             while tokens[i] != '}' and not(error):
                                 procedimientos.append(tokens[i])
                                 i+=1
                             if procedimientos[1] != '(':
-                                errorSintax()
+                                errorSintax(getframeinfo(currentframe()))
                                 error = True
 
                             #Chequea bracket al inicio del bloque#
                             sintaxBrackets = sintaxChecker('{', procedimientos)
                             if sintaxBrackets != True:
-                                errorSintax()
+                                errorSintax(getframeinfo(currentframe()))
 
                             for each in procedimientos:
                                 if each in instrucciones:
@@ -296,9 +373,9 @@ def parser(tokens):
                             while count < len(ins):
                                 pos = procedimientos.index(ins[count])
                                 if procedimientos[pos+1] != '(':
-                                    errorSintax()
+                                    errorSintax(getframeinfo(currentframe()))
                                 if procedimientos[pos+3] != ')':
-                                    errorSintax()
+                                    errorSintax(getframeinfo(currentframe()))
                                 else:
                                     count+=1
                         
@@ -306,9 +383,8 @@ def parser(tokens):
                             error = True
             elif tokens[i] in instrucciones:
                 i+=1
-                print(tokens)
                 i,error=evalins(tokens,i,error)
-            elif tokens[i] in variables :
+            elif tokens[i] in variables:
                 i+=1
                 if tokens[i]=="=" or (tokens[i][0]=="=" and (tokens[i][1:].isdigit())):
                     i+=1
@@ -319,7 +395,7 @@ def parser(tokens):
                             print(variables)
                             i+=1
                         else:
-                            errorSintax()
+                            errorSintax(getframeinfo(currentframe()))
                             error=True
                     elif (("." or "-") not in tokens[i-1]):
                         if tokens[i]==";":
@@ -327,15 +403,15 @@ def parser(tokens):
                             print(variables)
                             i+=1
                         else:
-                            errorSintax()
+                            errorSintax(getframeinfo(currentframe()))
                             error=True
 
 
                     else:
-                        errorSintax()
+                        errorSintax(getframeinfo(currentframe()))
                         error=True
                 else:
-                    errorSintax()
+                    errorSintax(getframeinfo(currentframe()))
                     error=True
 
             elif "=" in tokens[i]:
@@ -346,7 +422,7 @@ def parser(tokens):
                         p+=k  
                     else:
                         if not(p in variables):
-                            errorSintax()
+                            errorSintax(getframeinfo(currentframe()))
                             error=True
                         else:
                             param.append(p)
@@ -360,10 +436,10 @@ def parser(tokens):
                             print(variables)
                             i+=1
                         else:
-                            errorSintax()
+                            errorSintax(getframeinfo(currentframe()))
                             error=True    
                     else:    
-                        errorSintax()
+                        errorSintax(getframeinfo(currentframe()))
                         error=True
                 else:
                     i+=1
@@ -372,11 +448,11 @@ def parser(tokens):
                         print(variables)
                         i+=1 
                     else:
-                        errorSintax()
+                        errorSintax(getframeinfo(currentframe()))
                         error=True       
 
             else:
-                errorSintax()
+                errorSintax(getframeinfo(currentframe()))
 
 
 
@@ -384,7 +460,7 @@ def parser(tokens):
 
     ##Si no empieza por PROG y termina en GORP       
     else:
-        errorSintax()  
+        errorSintax(getframeinfo(currentframe())) 
 
 
 

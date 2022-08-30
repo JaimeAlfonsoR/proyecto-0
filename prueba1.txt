@@ -1,6 +1,18 @@
 PROG
 VAR nop,x,y;
-walk(right,9);
+PROC goNorth ()
+{
+
+ if ( canWalk ( west ,1) ){ walk ( west ,1) } else { walk ( west ,1) } fi
+
+
+
+
+}
+CORP
+
+
+
 nop =90;
 
 

@@ -1,9 +1,11 @@
 from asyncio.windows_events import NULL
 from distutils.command.config import config
+from xmlrpc.client import boolean
 import nltk as tk
 
 comandos=["M","R","C","B","c","b","P","J","G"]                    #definicion de grupos
-instrucciones=["walk","jump","jumpTo","veer","look","drop","grab","get","free","pop","walk", "PROC", "CORP"]     
+instrucciones=["walk","jump","jumpTo","veer","look","drop","grab","get","free","pop","walk", "PROC", "CORP"]  
+ins2=["walk", "jump", "grab", "pop", "pick", "free","drop"]   
 condiciones=["isfacing","isValid","canWalk","not"]
 direcciones1=["left","right","around"]
 direcciones2=["left","right","front","back"]
@@ -65,7 +67,7 @@ def explorarparam(num:int, tokens:list,i:int):
             q+=1
     return i,error
 
-def evalins (tokens:list,i:int,error:bool):
+def evalins (tokens:list,i:int,error:bool, fin:bool):
     if tokens[i]==";":
         i+=1
         error=True
@@ -158,12 +160,13 @@ def evalins (tokens:list,i:int,error:bool):
                 i,error=explorarparam(1,tokens,i)   
         if tokens[i]==")":
             i+=1
+            if fin:
                       
-            if tokens[i]==";":
-                i+=1
-            else:
-                errorSintax()
-                error=True 
+                if tokens[i]==";":
+                    i+=1
+                else:
+                    errorSintax()
+                    error=True 
         else:
             errorSintax()
             error=True        
@@ -174,6 +177,106 @@ def evalins (tokens:list,i:int,error:bool):
 
     return i,error
 
+def evalcond (i:int,tokens:list,error:bool):
+    if tokens[i] in condiciones:
+        if tokens[i]=="isfacing":
+            i+=1
+            if tokens[i]=="(":
+                i+=1
+                if tokens[i] in card:
+                    i+=1
+                    if tokens[i] ==")":
+                        i+=1
+                        if tokens[i]==";":
+                            i+=1
+                        else:
+                           
+                            errorSintax()
+                            error=True
+                    else:
+                        errorSintax()
+                        error=True  
+                else:
+                    errorSintax()
+                    error=True 
+            else:
+                errorSintax()
+                error=True
+        elif  tokens[i]=="isValid":
+            i+=1
+            if tokens[i]=="(":
+                i+=1
+                if tokens[i] in ins2:
+                    i+=1
+                    if tokens[i]==",":
+                        i+=1
+                        if tokens[i].isdigit() or (tokens[i] in variables):
+                            if ("." or "-") not in tokens[i] and tokens[i].isdigit():
+                                i+=1                   
+                            elif isinstance(variables[tokens[i]], int) and (tokens[i] in variables):
+                                i+=1
+                            else:
+                                errorSintax()   
+                                error=True
+                        else:
+                            errorSintax()    
+                            error=True
+                        d,error=evalins([tokens[i-3],"(",tokens[i-1],")"],1,error,False)    
+                    elif  tokens[i][0]==",":
+                        if tokens[i][1:].isdigit() and not (("." or "-") in tokens[i]):
+                            i+=1
+                            d,error=evalins([tokens[i-3],"(",tokens[i-1][1:],")"],1,error,False)
+                        else:
+                            errorSintax()    
+                            error=True    
+                    else:
+                        errorSintax()    
+                        error=True 
+        elif tokens[i]=="canWalk":
+            i+=1
+            if tokens[i]=="(":              
+                i+=1
+                v=str(tokens[i])
+                param=[]
+                p=""
+                for e in v:
+                    if e!="," and e!=" " and e!=")":
+                        p+=e
+                    else:
+                        if p!="":
+                            param.append(p) 
+                            p=""
+                if p!="":
+                    param.append(p)
+                if param=="2":
+
+                    if not(param[1].isdigit()) and not((param[1] in variables)):
+                        errorSintax()   
+                        error=True
+                    elif (("." or "-") in param[1]) and (param[1] not in variables):
+                        errorSintax()   
+                        error=True
+                    elif (param[1] in variables):
+                        if not(isinstance(variables[param[0]], int)):
+                            errorSintax()   
+                            error=True 
+                    if not(param[0] in direcciones2) and not((param[0] in card)):
+                        errorSintax()   
+                        error=True  
+                    i+=1
+                else:          
+                    if  (tokens[i] in direcciones2) or (tokens[i] in card):
+                        i+=1
+                        i,error=explorarparam(2,tokens,i)        
+                    else:
+                        errorSintax()
+                        error=True   
+        elif tokens[i]=="not":
+            i+=1
+            if tokens[i]=="(":
+                i+=1 
+                i,error=evalcond(i,tokens,error)                                  
+    return i,error
 
 
 def parser(tokens):
@@ -307,7 +410,7 @@ def parser(tokens):
             elif tokens[i] in instrucciones:
                 i+=1
                 print(tokens)
-                i,error=evalins(tokens,i,error)
+                i,error=evalins(tokens,i,error,True)
             elif tokens[i] in variables :
                 i+=1
                 if tokens[i]=="=" or (tokens[i][0]=="=" and (tokens[i][1:].isdigit())):
@@ -377,6 +480,7 @@ def parser(tokens):
 
             else:
                 errorSintax()
+                error=True
 
 
 

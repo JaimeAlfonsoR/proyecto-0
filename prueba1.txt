@@ -1,6 +1,7 @@
 PROG
 VAR nop,x,y;
-walk(right,9);
+walk(north,9);
+
 nop =90;
 
 
